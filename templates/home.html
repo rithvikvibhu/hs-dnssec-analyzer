@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+<!-- Page Content -->
+{% block content %}
+
+<div class="h-screen flex flex-col items-center justify-center text-center">
+  <h2 class="text-4xl font-bold">Analyze your DNSSEC config</h2>
+  <h3 class="mt-2 text-xl text-gray-800">
+    This site was made specifically for Handshake names,<br />but also work with regular domains.
+  </h3>
+  <div class="mt-6 w-full">
+    <div>
+      <input
+        id="domain"
+        value=""
+        class="w-3/6 px-4 py-3 text-lg rounded-md shadow-md"
+        placeholder="Enter a domain name"
+        required
+      />
+      <button
+        onclick="analyze()"
+        class="ml-2 px-4 py-3 text-lg uppercase bg-white rounded shadow-md hover:bg-gray-100"
+      >
+        Analyze
+      </button>
+    </div>
+  </div>
+  <div class="mt-6">
+    <span>Some sites to try: </span>
+    <a class="mx-2 underline" href="/analyze/proofofconcept">proofofconcept</span>
+    <a class="mx-2 underline" href="/analyze/3b">3b</span>
+    <a class="mx-2 underline" href="/analyze/humbly">humbly</span>
+    <a class="mx-2 underline" href="/analyze/torproject.org">torproject.org</span>
+  </div>
+</div>
+
+<script>
+  function analyze() {
+    window.location.href = `/analyze/${
+      document.getElementById('domain').value
+    }`;
+  }
+  document.getElementById('domain').addEventListener('keyup', event => {
+    if (event.key == 'Enter') analyze();
+  })
+</script>
+{% endblock %}

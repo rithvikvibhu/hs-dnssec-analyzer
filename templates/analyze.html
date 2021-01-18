@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+<!-- Page Content -->
+{% block content %}
+
+<style>
+  .show-on-load {
+    display: none;
+  }
+  .collapse {
+    max-height: 0px;
+    overflow-y: hidden;
+    transition: all 0.5s cubic-bezier(0, 1, 0, 1);
+  }
+  .collapse.show {
+    max-height: 99em;
+    padding: 16px 12px;
+    transition: all 0.5s ease-in-out;
+  }
+</style>
+
+<script>
+  function resizeIframe(iframe) {
+    iframe.height = iframe.contentWindow.document.body.scrollHeight + 40 + 'px';
+  }
+</script>
+
+<!-- Loader -->
+<svg
+  class="mt-20 w-28 mx-auto"
+  version="1.1"
+  id="loader-svg"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  x="0px"
+  y="0px"
+  viewBox="0 0 100 100"
+  enable-background="new 0 0 0 0"
+  xml:space="preserve"
+>
+  <path
+    fill="#fff"
+    d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50"
+  >
+    <animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      dur="1s"
+      from="0 50 50"
+      to="360 50 50"
+      repeatCount="indefinite"
+    />
+  </path>
+</svg>
+
+<!-- Error -->
+<div id="error" class="mt-20 text-center text-white"></div>
+
+<!-- Content -->
+<div class="mt-20 px-8 show-on-load">
+  <h3
+    class="inline-block text-2xl font-medium text-white border-b border-dashed"
+  >
+    Results for {{domain}}
+  </h3>
+
+  <div
+    class="mt-4 px-4 py-2 flex items-center justify-between rounded text-lg bg-white cursor-pointer"
+    data-toggle="collapse"
+    data-target=".collapse.print"
+    data-text="Collapse"
+  >
+    <h4>
+      <span>Records Queries</span>
+      <span class="ml-4 text-gray-600 text-sm">From dnsviz query</span>
+    </h4>
+    <span>+</span>
+  </div>
+
+  <pre
+    id="print-pre"
+    class="mt-2 p-0 rounded-md bg-white bg-opacity-60 shadow overflow-x-auto leading-7 max-h-0 collapse print"
+  >
+    Loading...
+  </pre>
+
+  <div
+    class="mt-4 px-4 py-2 flex items-center justify-between rounded text-lg bg-white cursor-pointer"
+    data-toggle="collapse"
+    data-target=".collapse.delv"
+    data-text="Collapse"
+  >
+    <h4>
+      <span>DNSSEC signature chain</span>
+      <span class="ml-4 text-gray-600 text-sm">From delv</span>
+    </h4>
+    <span>+</span>
+  </div>
+
+  <pre
+    id="delv-pre"
+    class="mt-2 p-0 rounded-md bg-white bg-opacity-60 shadow overflow-x-auto leading-none max-h-0 collapse delv"
+  >
+    Loading...
+  </pre>
+</div>
+
+<div class="mt-8 text-center text-white show-on-load">
+  <h4 class="font-medium text-2xl">dnsviz graph</h4>
+  <p>
+    For more info and legend, check
+    <a
+      href="https://dnsviz.net/doc/dnssec/"
+      class="underline"
+      target="_blank"
+      rel="noopener noreferrer"
+      >dnsviz docs</a
+    >.
+  </p>
+</div>
+<iframe
+  id="graph-frame"
+  src=""
+  class="mt-2 mx-auto w-10/12 overflow-x-hidden show-on-load"
+  frameborder="0"
+  onload="resizeIframe(event.target)"
+></iframe>
+
+<script>
+  // Fetch data for domain
+  fetch('/analysis', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ domain: '{{domain}}' }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      document
+        .querySelectorAll('.show-on-load')
+        .forEach((el) => el.classList.remove('show-on-load'));
+      document.querySelector('#print-pre').innerHTML = data.print_data;
+      document.querySelector('#delv-pre').innerHTML = data.delv_data;
+      const frame = document.getElementById('graph-frame');
+      frame.contentDocument.open();
+      frame.contentDocument.write(data.graph_data);
+      frame.contentDocument.close();
+      document.querySelector('#loader-svg').classList.add('hidden');
+    })
+    .catch((error) => {
+      console.error(error);
+      document.querySelector('#error').textContent =
+        'Something went wrong. Refresh to try again.';
+      document.querySelector('#loader-svg').classList.add('hidden');
+    });
+</script>
+
+<script>
+  // Collapsibles
+  // Source: https://codepen.io/datchley/pen/Jvdryy
+  const triggers = Array.from(
+    document.querySelectorAll('[data-toggle="collapse"]')
+  );
+
+  triggers.forEach((el) => {
+    el.addEventListener('click', (event) => {
+      const selector = event.currentTarget.getAttribute('data-target');
+      collapse(selector, 'toggle');
+    });
+  });
+
+  const fnmap = {
+    toggle: 'toggle',
+    show: 'add',
+    hide: 'remove',
+  };
+  const collapse = (selector, cmd) => {
+    const targets = Array.from(document.querySelectorAll(selector));
+    targets.forEach((target) => {
+      target.classList[fnmap[cmd]]('show');
+    });
+  };
+</script>
+{% endblock %}

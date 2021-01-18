@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Handshake DNSSEC Analyzer</title>
+    <link
+      href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <header
+      class="fixed top-0 px-6 w-full flex items-center justify-between text-white bg-black bg-opacity-20"
+    >
+      <a href="/" class="py-2 text-2xl">Handshake DNSSEC Analyzer</a>
+      <a
+        href="https://github.com/rithvikvibhu/hs-dnssec-analyzer"
+        class="py-2 text-xl hover:underline"
+        rel="noopener noreferrer"
+        >GitHub</a
+      >
+    </header>
+    {% block content %}{% endblock %}
+  </body>
+</html>
