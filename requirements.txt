@@ -1,0 +1,5 @@
+dnsviz==0.8.2
+M2Crypto
+pygraphviz
+dnspython
+Flask
